@@ -8,8 +8,9 @@ Instead of relying on unstable PDF-to-Excel conversions or expensive third-party
 > ⚠️ **IMPORTANT COMPLIANCE NOTE**  
 > Tax regulations and official document layouts change periodically. **always ensure you are using the most up-to-date version of BIR Form 2316**. 
 > 
-> You can verify and download the latest official PDF templates directly from the **[BIR Official Forms Website]
-(https://www.bir.gov.ph/index.php/bir-forms/certificates.html)**.
+> You can verify and download the latest official PDF templates directly from the
+**[BIR Official Forms Website]
+(https://www.bir.gov.ph/bir-forms)**.
 
 ## ✨ Features
 * **Precision Stamping:** Uses `PyMuPDF` to write data at exact typographical points, completely independent of screen resolution.
