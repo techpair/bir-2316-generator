@@ -1,7 +1,3 @@
-Here is the updated `README.md` with a prominent compliance warning and the official BIR links added right at the top. This ensures anyone using the tool knows where to get the latest forms and avoids any bureaucratic headaches!
-
----
-
 ```markdown
 # BIR Form 2316 PDF Generator
 
