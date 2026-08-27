@@ -2,25 +2,38 @@ import fitz  # PyMuPDF
 from coordinates import FIELDS
 
 def generate_2316(data_payload, template_path, output_path):
-    # 1. Open the blank BIR 2316 template
     doc = fitz.open(template_path)
-    page = doc[0] # The 2316 is usually a single page
+    page = doc[0] 
 
-    # 2. Loop through the incoming data and stamp it onto the PDF
     for field_key, text_value in data_payload.items():
         if field_key in FIELDS:
-            x, y = FIELDS[field_key]
+            config = FIELDS[field_key]
+            start_x, y = config["coords"]
             
-            # Stamp the text at the specific coordinates
-            page.insert_text(
-                point=fitz.Point(x, y),
-                text=str(text_value),
-                fontsize=9,
-                fontname="helv", # Standard Helvetica
-                color=(0, 0, 0)  # Black text
-            )
+            # If the field has a "spacing" rule (like TIN or Zip Code)
+            if "spacing" in config:
+                current_x = start_x
+                # Loop through each digit and stamp it individually
+                for char in str(text_value):
+                    page.insert_text(
+                        point=fitz.Point(current_x, y),
+                        text=char,
+                        fontsize=10, # Slightly larger for boxes
+                        fontname="helv", 
+                        color=(0, 0, 0)
+                    )
+                    current_x += config["spacing"] # Move X right for the next box
+            
+            # Normal continuous text (like Names and Amounts)
+            else:
+                page.insert_text(
+                    point=fitz.Point(start_x, y),
+                    text=str(text_value),
+                    fontsize=9,
+                    fontname="helv",
+                    color=(0, 0, 0)
+                )
 
-    # 3. Save the newly filled PDF
     doc.save(output_path)
     doc.close()
     print(f"Successfully generated: {output_path}")
