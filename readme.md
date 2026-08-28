@@ -24,3 +24,75 @@ Instead of relying on unstable PDF-to-Excel conversions or expensive third-party
 ```bash
 git clone https://github.com/your-username/bir-2316-generator.git
 cd bir-2316-generator
+
+
+```markdown
+## 🌐 Running as an API Microservice
+
+This generator is wrapped in a lightweight FastAPI server, allowing it to run independently and accept data from any backend framework (Django, Flask, Node.js, Laravel) via HTTP POST requests.
+
+### 1. Install API Dependencies
+Ensure you have the API and server packages installed in your virtual environment:
+```bash
+pip install fastapi uvicorn pydantic
+
+```
+
+### 2. Start the Server
+
+Run the API on a dedicated unprivileged port (e.g., `8231`). Binding to `127.0.0.1` ensures the service is only accessible internally by your main application server.
+
+```bash
+uvicorn api:app --host 127.0.0.1 --port 8231
+
+```
+
+### 3. API Contract
+
+* **Endpoint:** `POST http://127.0.0.1:8231/generate-2316`
+* **Content-Type:** `application/json`
+* **Response:** Returns the generated `application/pdf` file directly as a downloadable stream.
+
+**Example Request Payload:**
+
+```json
+{
+  "employee_name": "Alvarez, Mateo S.",
+  "gross_compensation": "80,000.00",
+  "tin_part_1": "123",
+  "tin_part_2": "456",
+  "tin_part_3": "789",
+  "tin_part_4": "0000"
+}
+
+```
+
+### 4. Integration Example (Python/Requests)
+
+Here is how your main backend application calls the microservice and downloads the PDF:
+
+```python
+import requests
+
+url = "[http://127.0.0.1:8231/generate-2316](http://127.0.0.1:8231/generate-2316)"
+payload = {
+    "employee_name": "Alvarez, Mateo S.",
+    "gross_compensation": "80,000.00",
+    "tin_part_1": "123",
+    "tin_part_2": "456",
+    "tin_part_3": "789",
+    "tin_part_4": "0000"
+}
+
+# Send the data to the generator
+response = requests.post(url, json=payload)
+
+# Save the returned PDF stream
+if response.status_code == 200:
+    with open("downloads/2316_Alvarez.pdf", "wb") as f:
+        f.write(response.content)
+
+```
+
+```
+```
