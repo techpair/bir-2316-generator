@@ -26,14 +26,14 @@ git clone https://github.com/your-username/bir-2316-generator.git
 cd bir-2316-generator
 
 
-```markdown
+```
 ## 🌐 Running as an API Microservice
 
-This generator is wrapped in a lightweight FastAPI server, allowing it to run independently and accept data from any backend framework (Django, Flask, Node.js, Laravel) via HTTP POST requests.
+This generator is wrapped in a lightweight FastAPI server allowing it to run independently and accept data from any backend framework (Django, Flask, Node.js, Laravel) via HTTP POST requests.
 
 ### 1. Install API Dependencies
 Ensure you have the API and server packages installed in your virtual environment:
-```bash
+```
 pip install fastapi uvicorn pydantic
 
 ```
