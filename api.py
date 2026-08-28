@@ -8,12 +8,32 @@ app = FastAPI()
 
 # Define the expected incoming data structure
 class PayrollData(BaseModel):
-    employee_name: str
-    gross_compensation: str
-    tin_part_1: str
-    tin_part_2: str
-    tin_part_3: str
-    tin_part_4: str
+    # Part I
+    tin_part_1: str = ""
+    tin_part_2: str = ""
+    tin_part_3: str = ""
+    tin_part_4: str = ""
+    employee_name: str = ""
+    registered_address: str = ""
+    local_home_address: str = ""
+    date_of_birth: str = ""
+    contact_number: str = ""
+    
+    # Part II
+    employer_name: str = ""
+    employer_address: str = ""
+    employer_zip: str = ""
+    
+    # Financials
+    gross_compensation: str = ""
+    taxable_compensation: str = ""
+    non_taxable_compensation: str = ""
+    total_contributions: str = ""
+    tax_withheld: str = ""
+    
+    # Headers
+    period_from: str = ""
+    period_to: str = ""
     # Add other fields as you map them
 
 def cleanup_file(path: str):
