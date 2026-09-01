@@ -1,26 +1,34 @@
-from generator import generate_2316
 import os
+from generator import generate_2316  # Make sure this matches your actual import
 
 def main():
     template_path = os.path.join("templates", "2316_template.pdf")
     output_path = "2316_test_output.pdf"
 
-    # Split the TIN into its components (you will do this programmatically later in the backend)
-    full_tin = "123-456-789-0000"
-    tin_parts = full_tin.split("-")
-
-    dummy_data = {
-        "employee_name": "Alvarez, Mateo S.",
-        "gross_compensation": "80,000.00",
-        
-        # Map the TIN chunks
-        "tin_part_1": tin_parts[0] if len(tin_parts) > 0 else "",
-        "tin_part_2": tin_parts[1] if len(tin_parts) > 1 else "",
-        "tin_part_3": tin_parts[2] if len(tin_parts) > 2 else "",
-        "tin_part_4": tin_parts[3] if len(tin_parts) > 3 else ""
+    test_payload = {
+        "period_from": "0101",
+        "period_to": "1231",
+        "tin_part_1": "123",
+        "tin_part_2": "456",
+        "tin_part_3": "789",
+        "tin_part_4": "0000",
+        "employee_name": "CLONE-ACUÑA, EMILIA",
+        "registered_address": "123 TEST STREET, BRGY. NCR",
+        "local_home_address": "SAME AS ABOVE",
+        "date_of_birth": "05151990",
+        "contact_number": "09171234567",
+        "employer_name": "PMCFOODPARKS BY RAINTREE INC",
+        "employer_address": "6F SALUSTIANA TY TOWER MAKATI CITY",
+        "employer_zip": "1200",
+        "gross_compensation": "250,000.00",
+        "total_contributions": "15,400.00",
+        "non_taxable_compensation": "25,000.00",
+        "taxable_compensation": "209,600.00",
+        "tax_withheld": "12,500.00"
     }
 
-    generate_2316(dummy_data, template_path, output_path)
+    generate_2316(test_payload, template_path, output_path)
+    print(f"Test PDF successfully generated at: {output_path}")
 
 if __name__ == "__main__":
     main()
