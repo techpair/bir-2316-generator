@@ -1,98 +1,178 @@
 # BIR Form 2316 PDF Generator
 
-A standalone Python microservice designed to programmatically generate the official Philippine Bureau of Internal Revenue (BIR) Form 2316. 
+This project generates a filled BIR Form 2316 PDF by placing text at exact coordinate positions on the official template using PyMuPDF. It is designed as a lightweight, backend-friendly generator that can be used directly from Python or exposed through a FastAPI endpoint.
 
-Instead of relying on unstable PDF-to-Excel conversions or expensive third-party subscriptions, this tool uses precise X/Y coordinate mapping to overlay employee payroll data directly onto the official blank BIR PDF template.
+> ⚠️ Compliance note: BIR form layouts and tax requirements can change over time. Always confirm that you are using the latest official BIR Form 2316 template before production use.
 
-> ⚠️ **IMPORTANT COMPLIANCE NOTE**  
-> Tax regulations and official document layouts change periodically. **Always ensure you are using the most up-to-date version of BIR Form 2316**. 
-> 
-> You can verify and download the latest official PDF templates directly from the **[BIR Official Forms Website](https://www.bir.gov.ph/bir-forms)**.
+## Features
 
-## ✨ Features
-* **Precision Stamping:** Uses `PyMuPDF` to write data at exact typographical points, completely independent of screen resolution.
-* **Character Stepping & Chunking:** Intelligently handles government forms with segmented boxes (like TIN, RDO, and Zip Codes) by iterating through characters with custom spacing.
-* **Decoupled Architecture:** Built as an independent tool, making it highly scalable and ready to be integrated into any main backend (e.g., Truds Payroll) as an imported package or API service.
+- Precise PDF stamping using X/Y coordinates
+- Support for segmented fields such as TIN and ZIP code fields
+- Simple Python API for local generation
+- FastAPI endpoint for remote integration
+- Automatic cleanup of generated temporary files after download
 
-## 🛠️ Prerequisites
-* Python 3.10 or higher
-* `PyMuPDF` library
+## Project structure
 
-## 🚀 Installation & Setup
+- generator.py: main PDF rendering logic
+- api.py: FastAPI service and HTTP contract
+- coordinates.py: field coordinates and per-character spacing rules
+- test_run.py: sample script that generates a test PDF
+- templates/2316_template.pdf: blank template used for stamping
 
-1. **Clone the repository:**
+## Requirements
+
+- Python 3.10+
+- PyMuPDF
+- FastAPI
+- Uvicorn
+- Pydantic
+
+Install dependencies:
+
 ```bash
-git clone https://github.com/your-username/bir-2316-generator.git
-cd bir-2316-generator
-
-
-```
-## 🌐 Running as an API Microservice
-
-This generator is wrapped in a lightweight FastAPI server allowing it to run independently and accept data from any backend framework (Django, Flask, Node.js, Laravel) via HTTP POST requests.
-
-### 1. Install API Dependencies
-Ensure you have the API and server packages installed in your virtual environment:
-```
-pip install fastapi uvicorn pydantic
-
+pip install pymupdf fastapi uvicorn pydantic
 ```
 
-### 2. Start the Server
+## Quick start
 
-Run the API on a dedicated unprivileged port (e.g., `8231`). Binding to `127.0.0.1` ensures the service is only accessible internally by your main application server.
+### 1. Generate a local PDF using the sample script
+
+```bash
+python test_run.py
+```
+
+This creates a file named 2316_test_output.pdf in the project root using the sample payload in test_run.py.
+
+### 2. Start the API
 
 ```bash
 uvicorn api:app --host 127.0.0.1 --port 8231
-
 ```
 
-### 3. API Contract
+The service exposes:
 
-* **Endpoint:** `POST http://127.0.0.1:8231/generate-2316`
-* **Content-Type:** `application/json`
-* **Response:** Returns the generated `application/pdf` file directly as a downloadable stream.
+```http
+POST http://127.0.0.1:8231/generate-2316
+```
 
-**Example Request Payload:**
+## API contract
+
+The request body is a JSON object matching the PayrollData model in api.py.
+
+### Accepted fields
+
+- tin: single TIN string such as 123-456-789-0000
+- employee_name
+- registered_address
+- local_home_address
+- date_of_birth
+- contact_number
+- employer_name
+- employer_address
+- employer_zip
+- gross_compensation
+- taxable_compensation
+- non_taxable_compensation
+- total_contributions
+- tax_withheld
+- period_from
+- period_to
+
+The code normalizes the TIN internally by removing spaces and hyphens, then splits it into four numbered chunks required by the template mapping.
+
+### Example request
 
 ```json
 {
-  "employee_name": "Alvarez, Mateo S.",
-  "gross_compensation": "80,000.00",
-  "tin_part_1": "123",
-  "tin_part_2": "456",
-  "tin_part_3": "789",
-  "tin_part_4": "0000"
+  "tin": "123-456-789-0000",
+  "employee_name": "DOE, JANE M.",
+  "registered_address": "123 GENERIC BLVD., SAMPLE CITY",
+  "local_home_address": "SAME AS ABOVE",
+  "date_of_birth": "01011990",
+  "contact_number": "09990000000",
+  "employer_name": "SAMPLE COMPANY INC.",
+  "employer_address": "456 BUSINESS DIST., METRO CITY",
+  "employer_zip": "1000",
+  "gross_compensation": "250,000.00",
+  "taxable_compensation": "209,600.00",
+  "non_taxable_compensation": "25,000.00",
+  "total_contributions": "15,400.00",
+  "tax_withheld": "12,500.00",
+  "period_from": "0101",
+  "period_to": "1231"
 }
-
 ```
 
-### 4. Integration Example (Python/Requests)
-
-Here is how your main backend application calls the microservice and downloads the PDF:
+### Example client call
 
 ```python
 import requests
 
-url = "[http://127.0.0.1:8231/generate-2316](http://127.0.0.1:8231/generate-2316)"
+response = requests.post(
+    "http://127.0.0.1:8231/generate-2316",
+    json={
+        "tin": "123-456-789-0000",
+        "employee_name": "DOE, JANE M.",
+        "registered_address": "123 GENERIC BLVD., SAMPLE CITY",
+        "local_home_address": "SAME AS ABOVE",
+        "date_of_birth": "01011990",
+        "contact_number": "09990000000",
+        "employer_name": "SAMPLE COMPANY INC.",
+        "employer_address": "456 BUSINESS DIST., METRO CITY",
+        "employer_zip": "1000",
+        "gross_compensation": "250,000.00",
+        "taxable_compensation": "209,600.00",
+        "non_taxable_compensation": "25,000.00",
+        "total_contributions": "15,400.00",
+        "tax_withheld": "12,500.00",
+        "period_from": "0101",
+        "period_to": "1231",
+    }
+)
+
+if response.status_code == 200:
+    with open("2316_output.pdf", "wb") as f:
+        f.write(response.content)
+```
+
+## Direct Python usage
+
+You can also call the generator directly from Python:
+
+```python
+from generator import generate_2316
+
 payload = {
-    "employee_name": "Alvarez, Mateo S.",
-    "gross_compensation": "80,000.00",
-    "tin_part_1": "123",
-    "tin_part_2": "456",
-    "tin_part_3": "789",
-    "tin_part_4": "0000"
+    "period_from": "0101",
+    "period_to": "1231",
+    "tin": "111-222-333-4444",
+    "employee_name": "DOE, JANE M.",
+    "registered_address": "123 GENERIC BLVD., SAMPLE CITY",
+    "local_home_address": "SAME AS ABOVE",
+    "date_of_birth": "01011990",
+    "contact_number": "09990000000",
+    "employer_name": "SAMPLE COMPANY INC.",
+    "employer_address": "456 BUSINESS DIST., METRO CITY",
+    "employer_zip": "1000",
+    "gross_compensation": "250,000.00",
+    "total_contributions": "15,400.00",
+    "non_taxable_compensation": "25,000.00",
+    "taxable_compensation": "209,600.00",
+    "tax_withheld": "12,500.00",
 }
 
-# Send the data to the generator
-response = requests.post(url, json=payload)
-
-# Save the returned PDF stream
-if response.status_code == 200:
-    with open("downloads/2316_Alvarez.pdf", "wb") as f:
-        f.write(response.content)
-
+generate_2316(payload, "templates/2316_template.pdf", "2316_output.pdf")
 ```
 
-```
+## Notes
+
+- The generator uses the top-left corner of the PDF page as the origin for coordinates.
+- Fields with segmented data use custom spacing values defined in coordinates.py.
+- The API returns the generated PDF as a downloadable file and removes the temporary output file after the response is sent.
+
+## Important
+
+This project stamps data onto a PDF template; it does not validate tax rules or generate legal tax advice. For production use, keep the template up to date and verify field placement against the current BIR form layout.
+
 ```
