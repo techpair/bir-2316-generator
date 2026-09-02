@@ -1,5 +1,5 @@
 import os
-from generator import generate_2316  # Make sure this matches your actual import
+from generator import generate_2316
 
 def main():
     template_path = os.path.join("templates", "2316_template.pdf")
@@ -8,15 +8,15 @@ def main():
     test_payload = {
         "period_from": "0101",
         "period_to": "1231",
-        "tin": "123-456-789-0000",
-        "employee_name": "CLONE-ACUÑA, EMILIA",
-        "registered_address": "123 TEST STREET, BRGY. NCR",
+        "tin": "111-222-333-4444",
+        "employee_name": "DOE, JANE M.",
+        "registered_address": "123 GENERIC BLVD., SAMPLE CITY",
         "local_home_address": "SAME AS ABOVE",
-        "date_of_birth": "05151990",
-        "contact_number": "09171234567",
-        "employer_name": "PMCFOODPARKS BY RAINTREE INC",
-        "employer_address": "6F SALUSTIANA TY TOWER MAKATI CITY",
-        "employer_zip": "1200",
+        "date_of_birth": "01011990",
+        "contact_number": "09990000000",
+        "employer_name": "SAMPLE COMPANY INC.",
+        "employer_address": "456 BUSINESS DIST., METRO CITY",
+        "employer_zip": "1000",
         "gross_compensation": "250,000.00",
         "total_contributions": "15,400.00",
         "non_taxable_compensation": "25,000.00",
