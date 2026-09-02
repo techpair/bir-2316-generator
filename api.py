@@ -9,10 +9,7 @@ app = FastAPI()
 # Define the expected incoming data structure
 class PayrollData(BaseModel):
     # Part I
-    tin_part_1: str = ""
-    tin_part_2: str = ""
-    tin_part_3: str = ""
-    tin_part_4: str = ""
+    tin: str = ""  # Replaced the 4 parts with a single TIN field
     employee_name: str = ""
     registered_address: str = ""
     local_home_address: str = ""
@@ -34,7 +31,6 @@ class PayrollData(BaseModel):
     # Headers
     period_from: str = ""
     period_to: str = ""
-    # Add other fields as you map them
 
 def cleanup_file(path: str):
     """Deletes the PDF after it is sent to save server space."""
@@ -43,12 +39,25 @@ def cleanup_file(path: str):
 
 @app.post("/generate-2316")
 def create_pdf(data: PayrollData, background_tasks: BackgroundTasks):
+    # Convert payload to a mutable dictionary
+    payload = data.dict()
+    
+    # Extract and clean the TIN (remove hyphens and spaces)
+    raw_tin = payload.pop("tin", "").replace("-", "").replace(" ", "")
+    
+    # Map the cleaned TIN into the 4 chunks the plotting engine expects
+    payload["tin_part_1"] = raw_tin[0:3]
+    payload["tin_part_2"] = raw_tin[3:6]
+    payload["tin_part_3"] = raw_tin[6:9]
+    payload["tin_part_4"] = raw_tin[9:]
+
     # Create a unique filename
-    output_path = f"2316_{data.employee_name.replace(' ', '_')}.pdf"
+    safe_name = payload["employee_name"].replace(" ", "_").replace(",", "")
+    output_path = f"2316_{safe_name}.pdf"
     template_path = os.path.join("templates", "2316_template.pdf")
     
-    # Run your existing generator
-    generate_2316(data.dict(), template_path, output_path)
+    # Run the generator with the modified payload
+    generate_2316(payload, template_path, output_path)
     
     # Schedule cleanup to run immediately after the file is downloaded
     background_tasks.add_task(cleanup_file, output_path)
@@ -58,4 +67,4 @@ def create_pdf(data: PayrollData, background_tasks: BackgroundTasks):
         output_path, 
         media_type="application/pdf", 
         filename=output_path
-    )   
+    )
