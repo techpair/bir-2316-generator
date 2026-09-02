@@ -8,10 +8,7 @@ def main():
     test_payload = {
         "period_from": "0101",
         "period_to": "1231",
-        "tin_part_1": "123",
-        "tin_part_2": "456",
-        "tin_part_3": "789",
-        "tin_part_4": "0000",
+        "tin": "123-456-789-0000",
         "employee_name": "CLONE-ACUÑA, EMILIA",
         "registered_address": "123 TEST STREET, BRGY. NCR",
         "local_home_address": "SAME AS ABOVE",
