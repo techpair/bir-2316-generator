@@ -6,6 +6,7 @@ def generate_2316(data_payload, template_path, output_path):
     page = doc[0] 
 
     # Intercept and split the TIN natively inside the generator
+    data_payload = data_payload.copy()
     if "tin" in data_payload:
         raw_tin = data_payload.pop("tin").replace("-", "").replace(" ", "")
         data_payload["tin_part_1"] = raw_tin[0:3]
