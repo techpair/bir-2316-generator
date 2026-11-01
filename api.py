@@ -53,7 +53,7 @@ def create_pdf(data: PayrollData, background_tasks: BackgroundTasks):
 
     # Create a unique filename
     safe_name = payload["employee_name"].replace(" ", "_").replace(",", "")
-    output_path = f"2316_{safe_name}.pdf"
+    output_path = f"2316_{safe_name}_{os.urandom(16).hex()}.pdf"
     template_path = os.path.join("templates", "2316_template.pdf")
     
     # Run the generator with the modified payload
