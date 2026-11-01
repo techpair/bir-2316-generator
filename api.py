@@ -10,6 +10,10 @@ app = FastAPI()
 class PayrollData(BaseModel):
     # Part I
     tin: str = ""  # Replaced the 4 parts with a single TIN field
+    tin_part_1: str = ""
+    tin_part_2: str = ""
+    tin_part_3: str = ""
+    tin_part_4: str = ""
     employee_name: str = ""
     registered_address: str = ""
     local_home_address: str = ""
@@ -43,7 +47,10 @@ def create_pdf(data: PayrollData, background_tasks: BackgroundTasks):
     payload = data.dict()
     
     # Extract and clean the TIN (remove hyphens and spaces)
-    raw_tin = payload.pop("tin", "").replace("-", "").replace(" ", "")
+    raw_tin = payload.pop("tin", "") or "".join(
+        payload.pop(f"tin_part_{part}", "") for part in range(1, 5)
+    )
+    raw_tin = raw_tin.replace("-", "").replace(" ", "")
     
     # Map the cleaned TIN into the 4 chunks the plotting engine expects
     payload["tin_part_1"] = raw_tin[0:3]

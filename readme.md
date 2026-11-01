@@ -63,6 +63,7 @@ The request body is a JSON object matching the PayrollData model in api.py.
 ### Accepted fields
 
 - tin: single TIN string such as 123-456-789-0000
+- tin_part_1 through tin_part_4: legacy segmented TIN fields, used when tin is empty
 - employee_name
 - registered_address
 - local_home_address
