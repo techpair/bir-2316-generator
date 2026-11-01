@@ -46,17 +46,14 @@ def create_pdf(data: PayrollData, background_tasks: BackgroundTasks):
     # Convert payload to a mutable dictionary
     payload = data.dict()
     
-    # Extract and clean the TIN (remove hyphens and spaces)
-    raw_tin = payload.pop("tin", "") or "".join(
-        payload.pop(f"tin_part_{part}", "") for part in range(1, 5)
-    )
-    raw_tin = raw_tin.replace("-", "").replace(" ", "")
-    
-    # Map the cleaned TIN into the 4 chunks the plotting engine expects
-    payload["tin_part_1"] = raw_tin[0:3]
-    payload["tin_part_2"] = raw_tin[3:6]
-    payload["tin_part_3"] = raw_tin[6:9]
-    payload["tin_part_4"] = raw_tin[9:]
+    # Normalize and split only a supplied single-string TIN.
+    raw_tin = payload.pop("tin", "")
+    if raw_tin:
+        raw_tin = raw_tin.replace("-", "").replace(" ", "")
+        payload["tin_part_1"] = raw_tin[0:3]
+        payload["tin_part_2"] = raw_tin[3:6]
+        payload["tin_part_3"] = raw_tin[6:9]
+        payload["tin_part_4"] = raw_tin[9:]
 
     # Create a unique filename
     safe_name = payload["employee_name"].replace(" ", "_").replace(",", "")
